@@ -14,3 +14,7 @@ export const login = async (data: LoginDto) => {
   const res = await api.post("/auth/login", data);
   return res.data.data;  //as accesstoken is nested = data.data.accessToken
 };
+
+export const logout = async () => {
+  await api.post("/auth/logout");
+};

@@ -42,10 +42,21 @@ const handleRegister = async (data: RegisterDto) => {
   }
 };
 
+const handleLogout = async () => {
+  try {
+    await authService.logout();
+  } catch (error) {
+    console.error("Logout failed");
+  } finally {
+    localStorage.removeItem("accessToken");
+  }
+};
+
   return {
     loading,
     handleRegister,
     handleVerifyOtp,
     handleLogin,
+    handleLogout
   };
 };
