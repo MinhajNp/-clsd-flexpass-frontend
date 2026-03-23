@@ -31,7 +31,15 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        await api.post("/auth/refresh-token");
+        const res = await api.post("/auth/refresh-token");
+
+        const newToken = res.data.data.accessToken;
+
+        // ✅ STORE NEW TOKEN
+        localStorage.setItem("accessToken", newToken);
+
+        // ✅ UPDATE HEADER
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
 
         return api(originalRequest);
       } catch (err) {
