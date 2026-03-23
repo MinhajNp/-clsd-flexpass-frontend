@@ -13,14 +13,27 @@ const RegisterForm = ({ onSubmit }: Props) => {
     name: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
 
   const [error, setError] = useState("");
 
+  const handleChange = (key: keyof typeof form, value: string) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
   const validate = () => {
     if (!form.name.trim()) return "Name is required";
-    if (!form.email.includes("@")) return "Invalid email";
-    if (form.password.length < 6) return "Password must be at least 6 chars";
+
+    if (!/^\S+@\S+\.\S+$/.test(form.email))
+      return "Invalid email format";
+
+    if (form.password.length < 6)
+      return "Password must be at least 6 characters";
+
+    if (form.password !== form.confirmPassword)
+      return "Passwords do not match";
+
     return "";
   };
 
@@ -34,7 +47,13 @@ const RegisterForm = ({ onSubmit }: Props) => {
     }
 
     setError("");
-    onSubmit(form);
+
+    // only send required fields
+    onSubmit({
+      name: form.name,
+      email: form.email,
+      password: form.password,
+    });
   };
 
   return (
@@ -42,25 +61,28 @@ const RegisterForm = ({ onSubmit }: Props) => {
       <input
         placeholder="Name"
         value={form.name}
-        onChange={(e) =>
-          setForm({ ...form, name: e.target.value })
-        }
+        onChange={(e) => handleChange("name", e.target.value)}
       />
 
       <input
         placeholder="Email"
         value={form.email}
-        onChange={(e) =>
-          setForm({ ...form, email: e.target.value })
-        }
+        onChange={(e) => handleChange("email", e.target.value)}
       />
 
       <input
         type="password"
         placeholder="Password"
         value={form.password}
+        onChange={(e) => handleChange("password", e.target.value)}
+      />
+
+      <input
+        type="password"
+        placeholder="Confirm Password"
+        value={form.confirmPassword}
         onChange={(e) =>
-          setForm({ ...form, password: e.target.value })
+          handleChange("confirmPassword", e.target.value)
         }
       />
 

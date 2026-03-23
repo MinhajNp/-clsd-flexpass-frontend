@@ -5,6 +5,7 @@ import OtpPage from "../pages/OtpPage";
 import DashboardPage from "../pages/DashboardPage";
 import ProtectedRoute from "./ProtectdRoute";
 import PublicRoute from "./PublicRoute";
+import AdminUsersPage from "../pages/AdminUsersPage";
 
 
 const AppRouter = () => {
@@ -44,6 +45,15 @@ const AppRouter = () => {
                     element={
                         <ProtectedRoute>
                             <DashboardPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/users"
+                    element={
+                        <ProtectedRoute>
+                            <AdminUsersPage />
                         </ProtectedRoute>
                     }
                 />

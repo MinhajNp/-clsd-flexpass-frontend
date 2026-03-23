@@ -29,8 +29,6 @@ const LoginPage = () => {
     //  storing accessToken in localStorage
       if (res.accessToken) {
         localStorage.setItem("accessToken", res.accessToken);
-        console.log("stored:", localStorage.getItem("accessToken"));
-        alert(localStorage.getItem("accessToken"))
         navigate("/dashboard"); // placeholder
       }
     } catch (err: any) {

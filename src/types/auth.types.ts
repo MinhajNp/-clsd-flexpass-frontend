@@ -24,3 +24,10 @@ export type LoginResponse = {
   accessToken?: string;
   message: string;
 };
+
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+  status: "ACTIVE" | "BLOCKED";
+};
