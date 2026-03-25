@@ -17,7 +17,7 @@ const LoginPage = () => {
 
       const res = await handleLogin(data);
 
-      // 🔥 KEY LOGIC
+      //  KEY LOGIC
       if (res.requiresOtp) {
         navigate("/otp", {
           state: { email: data.email },
@@ -28,7 +28,6 @@ const LoginPage = () => {
       // ✅ direct login
     //  storing accessToken in localStorage
       if (res.accessToken) {
-        localStorage.setItem("accessToken", res.accessToken);
         navigate("/dashboard"); // placeholder
       }
     } catch (err: any) {

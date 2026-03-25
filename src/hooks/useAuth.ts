@@ -52,11 +52,38 @@ const handleLogout = async () => {
   }
 };
 
+
+const handleForgotPassword = async (email: string) => {
+  try {
+    setLoading(true);
+    return await authService.forgotPassword(email);
+  } catch (err: any) {
+    throw new Error(err.response?.data?.message || "Failed");
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleResetPassword = async (data: {
+  email: string;
+  otp: string;
+  newPassword: string;
+}) => {
+  try {
+    setLoading(true);
+    return await authService.resetPassword(data);
+  } finally {
+    setLoading(false);
+  }
+};
+
   return {
     loading,
     handleRegister,
     handleVerifyOtp,
     handleLogin,
-    handleLogout
+    handleLogout,
+    handleForgotPassword,
+    handleResetPassword
   };
 };

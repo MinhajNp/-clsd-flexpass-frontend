@@ -6,6 +6,8 @@ import DashboardPage from "../pages/DashboardPage";
 import ProtectedRoute from "./ProtectdRoute";
 import PublicRoute from "./PublicRoute";
 import AdminUsersPage from "../pages/AdminUsersPage";
+import ResetPasswordPage from "../pages/ResetPasswordPage";
+import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 
 
 const AppRouter = () => {
@@ -57,6 +59,9 @@ const AppRouter = () => {
                         </ProtectedRoute>
                     }
                 />
+
+                <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
+                <Route path="/reset-password" element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
             </Routes>
         </BrowserRouter>
     );

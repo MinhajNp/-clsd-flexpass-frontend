@@ -1,12 +1,15 @@
 import { useState } from "react";
 import type { LoginDto } from "../../types/auth.types";
+import { useNavigate } from "react-router-dom";
 
 
 type Props = {
   onSubmit: (data: LoginDto) => void;
 };
 
+
 const LoginForm = ({ onSubmit }: Props) => {
+  const navigate = useNavigate()
   const [form, setForm] = useState<LoginDto>({
     email: "",
     password: "",
@@ -43,6 +46,7 @@ const LoginForm = ({ onSubmit }: Props) => {
   };
 
   return (
+    <div>
     <form onSubmit={handleSubmit}>
       <input
         placeholder="Email"
@@ -64,7 +68,17 @@ const LoginForm = ({ onSubmit }: Props) => {
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       <button type="submit">Login</button>
+      
     </form>
+
+        <button
+           type="button"
+          onClick={() => navigate("/forgot-password")}>
+            Forgot Password?
+        </button>
+    </div>
+
+
   );
 };
 

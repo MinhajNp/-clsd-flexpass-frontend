@@ -18,3 +18,17 @@ export const login = async (data: LoginDto) => {
 export const logout = async () => {
   await api.post("/auth/logout");
 };
+
+export const forgotPassword = async (email: string) => {
+  const res = await api.post("/auth/forgot-password", { email });
+  return res.data;
+};
+
+export const resetPassword = async (data: {
+  email: string;
+  otp: string;
+  newPassword: string;
+}) => {
+  const res = await api.post("/auth/reset-password", data);
+  return res.data;
+};
