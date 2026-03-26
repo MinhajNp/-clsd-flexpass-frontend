@@ -46,9 +46,11 @@ const LoginForm = ({ onSubmit }: Props) => {
   };
 
   return (
-    <div>
+    <div
+    className="text-center">
     <form onSubmit={handleSubmit}>
       <input
+      className="inline-block"
         placeholder="Email"
         value={form.email}
         onChange={(e) =>

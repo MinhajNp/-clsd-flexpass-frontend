@@ -28,6 +28,7 @@ const LoginPage = () => {
       // ✅ direct login
     //  storing accessToken in localStorage
       if (res.accessToken) {
+        localStorage.setItem("accessToken", res.accessToken);
         navigate("/dashboard"); // placeholder
       }
     } catch (err: any) {
@@ -37,6 +38,9 @@ const LoginPage = () => {
 
   return (
     <>
+    <h1 className="text-3xl font-bold underline text-center mt-5">
+      Login
+    </h1>
       {error && <p style={{ color: "red" }}>{error}</p>}
       {loading && <p>Logging in...</p>}
       <LoginForm onSubmit={onSubmit} />
