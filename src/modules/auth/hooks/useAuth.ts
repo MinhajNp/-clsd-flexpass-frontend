@@ -1,0 +1,89 @@
+import { useState } from "react";
+import * as authService from "../services/authService";
+import type { LoginDto, RegisterDto, VerifyOtpDto } from "../types/auth.types";
+
+
+export const useAuth = () => {
+  const [loading, setLoading] = useState(false);
+
+  const handleRegister = async (data: RegisterDto) => {
+    try {
+      setLoading(true);
+      return await authService.register(data);
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      const message = err.response?.data?.message || "Something went wrong";
+      throw new Error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (data: VerifyOtpDto) => {
+    try {
+      setLoading(true);
+      const res = await authService.verifyOtp(data);
+      return res.data;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogin = async (data: LoginDto) => {
+    try {
+      setLoading(true);
+      return await authService.login(data);
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      const message = err.response?.data?.message || "Login failed";
+      throw new Error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error("Logout failed");
+    } finally {
+      localStorage.removeItem("accessToken");
+    }
+  };
+
+  const handleForgotPassword = async (email: string) => {
+    try {
+      setLoading(true);
+      return await authService.forgotPassword(email);
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      throw new Error(error.response?.data?.message || "Failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (data: {
+    email: string;
+    otp: string;
+    newPassword: string;
+  }) => {
+    try {
+      setLoading(true);
+      return await authService.resetPassword(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
+    loading,
+    handleRegister,
+    handleVerifyOtp,
+    handleLogin,
+    handleLogout,
+    handleForgotPassword,
+    handleResetPassword,
+  };
+};

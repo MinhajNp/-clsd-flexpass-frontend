@@ -17,20 +17,17 @@ const ResetPasswordPage = () => {
         otp,
         newPassword: password,
       });
-
       navigate("/auth");
-    } catch (err: any) {
-      alert(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      alert(message);
     }
   };
 
   return (
     <div>
-      <div >
-
-        <h2>
-          Reset Password
-        </h2>
+      <div>
+        <h2>Reset Password</h2>
 
         <input
           placeholder="Enter OTP"
@@ -45,9 +42,7 @@ const ResetPasswordPage = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button
-          onClick={submit}
-        >
+        <button onClick={submit}>
           {loading ? "Resetting..." : "Reset Password"}
         </button>
       </div>

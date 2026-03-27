@@ -1,13 +1,14 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import RegisterPage from "../pages/RegisterPage";
-import LoginPage from "../pages/LoginPage";
-import OtpPage from "../pages/OtpPage";
-import DashboardPage from "../pages/DashboardPage";
-import ProtectedRoute from "./ProtectdRoute";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+import ForgotPasswordPage from "../modules/auth/pages/ForgotPasswordPage";
 import PublicRoute from "./PublicRoute";
-import AdminUsersPage from "../pages/AdminUsersPage";
-import ResetPasswordPage from "../pages/ResetPasswordPage";
-import ForgotPasswordPage from "../pages/ForgotPasswordPage";
+import AuthPage from "../modules/auth/pages/AuthPage";
+import OtpPage from "../modules/auth/pages/OtpPage";
+import ProtectedRoute from "./ProtectdRoute";
+import UserDashboard from "../modules/user/pages/UserDashboard";
+import UserManagementPage from "../modules/admin/pages/UserManagementPage";
+import ResetPasswordPage from "../modules/auth/pages/ResetPasswordPage";
+
 
 
 const AppRouter = () => {
@@ -16,22 +17,19 @@ const AppRouter = () => {
             <Routes>
                 {/* Public */}
 
+                {/* Unified auth page (login + sign-up) */}
                 <Route
-                    path="/register"
+                    path="/auth"
                     element={
                         <PublicRoute>
-                            <RegisterPage />
+                            <AuthPage />
                         </PublicRoute>
                     }
                 />
-                <Route
-                    path="/login"
-                    element={
-                        <PublicRoute>
-                            <LoginPage />
-                        </PublicRoute>
-                    }
-                />
+                {/* Legacy redirects so old links still work */}
+                <Route path="/login"    element={<Navigate to="/auth" replace />} />
+                <Route path="/register" element={<Navigate to="/auth" replace />} />
+
                 <Route
                     path="/otp"
                     element={
@@ -46,7 +44,7 @@ const AppRouter = () => {
                     path="/dashboard"
                     element={
                         <ProtectedRoute>
-                            <DashboardPage />
+                            <UserDashboard />
                         </ProtectedRoute>
                     }
                 />
@@ -55,13 +53,16 @@ const AppRouter = () => {
                     path="/admin/users"
                     element={
                         <ProtectedRoute>
-                            <AdminUsersPage />
+                            <UserManagementPage />
                         </ProtectedRoute>
                     }
                 />
 
                 <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
-                <Route path="/reset-password" element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
+                <Route path="/reset-password"  element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
+
+                {/* Default: send root to /auth */}
+                <Route path="/" element={<Navigate to="/auth" replace />} />
             </Routes>
         </BrowserRouter>
     );

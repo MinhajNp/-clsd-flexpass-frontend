@@ -27,13 +27,11 @@ const OtpPage = () => {
 
     try {
       setError("");
-
       await handleVerifyOtp({ email, otp });
-
-      // ✅ redirect after success
-      navigate("/login");
-    } catch (err: any) {
-      setError(err.message || "OTP verification failed");
+      navigate("/auth");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "OTP verification failed";
+      setError(message);
     }
   };
 

@@ -10,22 +10,17 @@ const ForgotPasswordPage = () => {
   const submit = async () => {
     try {
       await handleForgotPassword(email);
-
-      navigate("/reset-password", {
-        state: { email },
-      });
-    } catch (err: any) {
-      alert(err.message);
+      navigate("/reset-password", { state: { email } });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      alert(message);
     }
   };
 
   return (
-    <div >
+    <div>
       <div>
-
-        <h2 className="text-lg font-semibold mb-4">
-          Forgot Password
-        </h2>
+        <h2 className="text-lg font-semibold mb-4">Forgot Password</h2>
 
         <input
           placeholder="Enter email"
@@ -33,9 +28,7 @@ const ForgotPasswordPage = () => {
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <button
-          onClick={submit}
-        >
+        <button onClick={submit}>
           {loading ? "Sending..." : "Send OTP"}
         </button>
       </div>

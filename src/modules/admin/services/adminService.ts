@@ -1,9 +1,10 @@
-import type { User } from "../../types/auth.types";
-import { api } from "../axios";
+
+import { api } from "../../../api/axios";
+import type { User } from "../../auth/types/auth.types";
 
 export const getUsers = async (): Promise<User[]> => {
   const res = await api.get("/admin/users");
-  console.log(res.data.data)
+  console.log(res.data.data);
   return res.data.data; // normalize
 };
 
