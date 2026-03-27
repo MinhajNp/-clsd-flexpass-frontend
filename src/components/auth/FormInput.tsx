@@ -41,7 +41,7 @@ const FormInput = ({
           "flex items-center rounded-xl border bg-gray-50 px-3.5 transition-all duration-200",
           "focus-within:ring-2 focus-within:ring-flex-primary/40 focus-within:border-flex-primary",
           error
-            ? "border-red-400 focus-within:ring-red-200 focus-within:border-red-400"
+            ? "border-red-500 focus-within:ring-red-200 focus-within:border-red-500"
             : "border-gray-200"
         )}
       >
@@ -72,7 +72,7 @@ const FormInput = ({
         )}
       </div>
 
-      {error && (
+      {error && error !== " " && (
         <p className="text-xs text-red-500 flex items-center gap-1">
           <span className="inline-block w-1 h-1 rounded-full bg-red-500 mt-0.5" />
           {error}

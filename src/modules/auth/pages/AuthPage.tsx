@@ -1,4 +1,5 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { CheckCircle, Smartphone, User } from "lucide-react";
 import { clsx } from "clsx";
 import FormInput from "../components/FormInput";
@@ -78,9 +79,15 @@ const AuthPage = () => {
 
   const update = (key: keyof FormState, value: string | boolean) => {
     setForm((prev) => ({ ...prev, [key]: value }));
-    if (errors[key as keyof FormErrors]) {
-      setErrors((prev) => ({ ...prev, [key]: undefined }));
-    }
+    setErrors((prev) => {
+      if (Object.keys(prev).length === 0) return prev;
+      const next = { ...prev };
+      delete next[key as keyof FormErrors];
+      delete next.general;
+      if (next.email === " ") delete next.email;
+      if (next.password === " ") delete next.password;
+      return next;
+    });
   };
 
   const switchMode = (next: Mode) => {
@@ -107,15 +114,24 @@ const AuthPage = () => {
         }
         if (res.accessToken) {
           localStorage.setItem("accessToken", res.accessToken);
-          navigate("/dashboard");
+          navigate("/");
         }
       } else {
         await handleRegister({ name: form.name, email: form.email, password: form.password });
         navigate("/otp", { state: { email: form.email } });
       }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Something went wrong";
-      setErrors({ general: message });
+      if (mode === "login") {
+        toast.error("Login Failed");
+        setErrors({ 
+          general: "Wrong credentials. Please try again.",
+          email: " ",
+          password: " "
+        });
+      } else {
+        const message = err instanceof Error ? err.message : "Something went wrong";
+        setErrors({ general: message });
+      }
     }
   };
 
@@ -193,11 +209,7 @@ const AuthPage = () => {
               ))}
             </div>
 
-            {errors.general && (
-              <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-                <p className="text-sm text-red-600">{errors.general}</p>
-              </div>
-            )}
+
 
             <form id="auth-form" onSubmit={handleSubmit} noValidate className="space-y-5">
               {!isLogin && (
@@ -269,6 +281,12 @@ const AuthPage = () => {
                   </button>
                 )}
               </div>
+
+              {errors.general && (
+                <div className="mt-2 text-center">
+                  <p className="text-sm font-medium text-red-500">{errors.general}</p>
+                </div>
+              )}
 
               <Button
                 id="auth-submit-btn"

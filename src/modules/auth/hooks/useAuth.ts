@@ -1,4 +1,5 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 import * as authService from "../services/authService";
 import type { LoginDto, RegisterDto, VerifyOtpDto } from "../types/auth.types";
 
@@ -77,6 +78,22 @@ export const useAuth = () => {
     }
   };
 
+  const handleResendOtp = async (email: string) => {
+    try {
+      setLoading(true);
+      const data = await authService.resendOtp(email);
+      toast.success(data?.message || "OTP sent successfully");
+      return data;
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      const message = error.response?.data?.message || "Failed to resend OTP";
+      toast.error(message);
+      throw new Error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     loading,
     handleRegister,
@@ -85,5 +102,6 @@ export const useAuth = () => {
     handleLogout,
     handleForgotPassword,
     handleResetPassword,
+    handleResendOtp,
   };
 };
