@@ -1,4 +1,4 @@
-import { KeyboardEvent, ClipboardEvent, useRef, useState, useEffect } from "react";
+import { type KeyboardEvent,type ClipboardEvent, useRef, useState, useEffect } from "react";
 import { clsx } from "clsx";
 
 interface OtpInputProps {
@@ -88,7 +88,7 @@ const OtpInput = ({ length = 6, value, onChange }: OtpInputProps) => {
       {internalOtp.map((digit, index) => (
         <input
           key={index}
-          ref={(el) => (inputRefs.current[index] = el)}
+          ref={(el) => {(inputRefs.current[index] = el)}}
           type="text"
           inputMode="numeric"
           maxLength={1}

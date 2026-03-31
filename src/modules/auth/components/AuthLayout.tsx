@@ -166,7 +166,14 @@ const Footer = () => {
 
 export const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
+
+  // Admin pages handle their own layout (sidebar + admin header) — exclude public chrome
+  const isAdminPage = location.pathname.startsWith('/admin');
   const isExactAuthPages = ["/auth", "/otp", "/forgot-password", "/reset-password"].includes(location.pathname);
+
+  if (isAdminPage) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-white overflow-x-hidden font-sans">

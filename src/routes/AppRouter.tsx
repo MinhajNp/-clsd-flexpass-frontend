@@ -6,6 +6,7 @@ import OtpPage from "../modules/auth/pages/OtpPage";
 import ProtectedRoute from "./ProtectdRoute";
 import UserDashboard from "../modules/user/pages/UserDashboard";
 import UserManagementPage from "../modules/admin/pages/UserManagementPage";
+import AdminDashboard from "../modules/admin/pages/AdminDashboard";
 import ResetPasswordPage from "../modules/auth/pages/ResetPasswordPage";
 import LandingPage from "../modules/auth/pages/LandingPage";
 import GymApplicationPage from "../modules/gym/pages/GymApplicationPage";
@@ -46,6 +47,15 @@ const AppRouter = () => {
                         element={
                             <ProtectedRoute>
                                 <UserDashboard />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/admin"
+                        element={
+                            <ProtectedRoute>
+                                <AdminDashboard />
                             </ProtectedRoute>
                         }
                     />
