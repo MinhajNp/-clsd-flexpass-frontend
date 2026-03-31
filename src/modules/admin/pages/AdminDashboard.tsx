@@ -1,7 +1,8 @@
-import { Users, Building2, CalendarCheck, TrendingUp, Wallet, Clock, XCircle, AlertTriangle } from 'lucide-react';
+import { Users, Building2, CalendarCheck, TrendingUp, Wallet, Clock, XCircle, AlertTriangle, Loader2 } from 'lucide-react';
 import AdminLayout from '../components/AdminLayout';
 import GymStatusTable from '../components/GymStatusTable';
 import type { AdminDashboardData } from '../types/admin.types';
+import { useDashboardData } from '../hooks/useDashboardData';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -15,9 +16,9 @@ const DASHBOARD_DATA: AdminDashboardData = {
   stats: {
     totalUsers: 12450,
     activeGyms: 86,
-    todayCheckins: 1230,
+    todaysCheckins: 1230,
     monthlyRevenue: 840000,
-    pendingGymPayouts: 120000,
+    pendingPayouts: 120000,
   },
   revenueSnapshot: {
     totalCollected: 840000,
@@ -100,7 +101,20 @@ const ALERT_CONFIG = {
 // ─── Admin Dashboard ──────────────────────────────────────────────────────────
 
 const AdminDashboard = () => {
-  const { stats, revenueSnapshot: rev, alerts, gymOverview } = DASHBOARD_DATA;
+  const { stats: liveStats, isLoading } = useDashboardData();
+  const { revenueSnapshot: rev, alerts, gymOverview } = DASHBOARD_DATA;
+
+  const displayStats = liveStats || DASHBOARD_DATA.stats;
+
+  if (isLoading) {
+    return (
+      <AdminLayout title="Dashboard">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-[#2D5A53]" />
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout title="Dashboard">
@@ -111,31 +125,31 @@ const AdminDashboard = () => {
           <StatCard
             id="stat-total-users"
             title="Total Users"
-            value={stats.totalUsers.toLocaleString('en-IN')}
+            value={displayStats.totalUsers.toLocaleString('en-IN')}
             subtitle="Registered platform users"
           />
           <StatCard
             id="stat-active-gyms"
             title="Active Gyms"
-            value={stats.activeGyms.toString()}
+            value={displayStats.activeGyms.toLocaleString('en-IN')}
             subtitle="Verified & live gyms"
           />
           <StatCard
             id="stat-todays-checkins"
             title="Today's Check-ins"
-            value={stats.todayCheckins.toLocaleString('en-IN')}
+            value={displayStats.todaysCheckins.toLocaleString('en-IN')}
             subtitle="Across all partner gyms"
           />
           <StatCard
             id="stat-monthly-revenue"
             title="Monthly Revenue"
-            value={formatINR(stats.monthlyRevenue)}
+            value={formatINR(displayStats.monthlyRevenue)}
             subtitle="Current billing cycle"
           />
           <StatCard
             id="stat-pending-payouts"
             title="Pending Gym Payouts"
-            value={formatINR(stats.pendingGymPayouts)}
+            value={formatINR(displayStats.pendingPayouts)}
             subtitle="Awaiting disbursement"
           />
         </div>

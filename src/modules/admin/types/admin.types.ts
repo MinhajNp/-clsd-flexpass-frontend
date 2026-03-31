@@ -3,9 +3,9 @@
 export interface DashboardStats {
   totalUsers: number;
   activeGyms: number;
-  todayCheckins: number;
+  todaysCheckins: number;
   monthlyRevenue: number;
-  pendingGymPayouts: number;
+  pendingPayouts: number;
 }
 
 // ─── Revenue & Payout Snapshot ────────────────────────────────────────────────

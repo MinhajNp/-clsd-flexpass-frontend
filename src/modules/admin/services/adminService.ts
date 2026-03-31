@@ -30,6 +30,15 @@ export const fetchAllUsers = async (): Promise<AdminUser[]> => {
 };
 
 /**
+ * Fetch realtime dashboard stats
+ * GET /admin/dashboard/stats
+ */
+export const fetchDashboardStats = async (): Promise<any> => {
+  const res = await api.get('/admin/dashboard/stats');
+  return res.data.data;
+};
+
+/**
  * Toggle a user's status between Active ↔ Suspended.
  * PATCH /admin/users/:userId/status
  */
