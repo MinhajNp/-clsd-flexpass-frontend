@@ -25,6 +25,24 @@ export const useAuth = () => {
       setLoading(true);
       const res = await authService.verifyOtp(data);
       return res.data;
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      const message = err.response?.data?.message || "OTP verification failed";
+      throw new Error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleValidateOtp = async (data: VerifyOtpDto) => {
+    try {
+      setLoading(true);
+      const res = await authService.validateResetOtp(data);
+      return res.data;
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      const message = err.response?.data?.message || "Invalid OTP";
+      throw new Error(message);
     } finally {
       setLoading(false);
     }
@@ -86,6 +104,10 @@ export const useAuth = () => {
     try {
       setLoading(true);
       return await authService.resetPassword(data);
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      const message = err.response?.data?.message || "Password reset failed";
+      throw new Error(message);
     } finally {
       setLoading(false);
     }
@@ -111,6 +133,7 @@ export const useAuth = () => {
     loading,
     handleRegister,
     handleVerifyOtp,
+    handleValidateOtp,
     handleLogin,
     handleGoogleLogin,
     handleLogout,

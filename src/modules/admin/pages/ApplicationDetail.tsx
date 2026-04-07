@@ -276,7 +276,7 @@ const ApplicationDetail: React.FC = () => {
                         <span className="text-sm font-bold text-gray-800">{doc.name}</span>
                       </div>
                       <a 
-                        href={`${BASE_URL}${doc.url}`} 
+                        href={doc.url?.startsWith('http') ? doc.url : `${BASE_URL}${doc.url}`} 
                         target="_blank" 
                         rel="noreferrer"
                         className="text-gray-400 hover:text-[#2D5A53] transition-colors"

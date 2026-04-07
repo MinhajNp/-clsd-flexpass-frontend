@@ -43,7 +43,7 @@ const OtpPage = () => {
   const email = state?.email;
   const mode = state?.mode || "verify";
 
-  const { handleVerifyOtp, handleResendOtp, loading } = useAuth();
+  const { handleVerifyOtp, handleValidateOtp, handleResendOtp, loading } = useAuth();
 
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
@@ -88,13 +88,20 @@ const OtpPage = () => {
     if (e) e.preventDefault();
     if (!isOtpComplete) return;
 
+    setError("");
+
     if (mode === "reset") {
-      navigate("/reset-password", { state: { email, otp } });
+      try {
+        await handleValidateOtp({ email, otp });
+        navigate("/reset-password", { state: { email, otp } });
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "OTP verification failed";
+        setError(message);
+      }
       return;
     }
 
     try {
-      setError("");
       await handleVerifyOtp({ email, otp });
       toast.success("Registration completed successfully!");
       navigate("/auth"); // Redirect to login after email verification

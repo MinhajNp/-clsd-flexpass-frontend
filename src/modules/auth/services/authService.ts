@@ -16,6 +16,9 @@ export const register = (data: RegisterDto): Promise<AxiosResponse<RegisterRespo
 export const verifyOtp = (data: VerifyOtpDto) =>
   api.post("/auth/verify-otp", data);
 
+export const validateResetOtp = (data: VerifyOtpDto) =>
+  api.post("/auth/validate-reset-otp", data);
+
 export const login = async (data: LoginDto) => {
   const res = await api.post("/auth/login", data);
   return res.data.data; // accessToken is nested: data.data.accessToken
