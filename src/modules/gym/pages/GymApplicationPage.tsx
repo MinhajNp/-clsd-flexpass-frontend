@@ -11,6 +11,7 @@ import BankDetailsForm from "../components/BankDetailsForm";
 import Button from "../../../components/ui/Button";
 import type { GymApplicationData } from "../types/gym.types";
 import { submitGymApplication } from "../services/gymService";
+import { useNavigate } from "react-router-dom";
 
 const INITIAL_STATE: GymApplicationData = {
   gymName: "",
@@ -40,6 +41,7 @@ const INITIAL_STATE: GymApplicationData = {
 };
 
 const GymApplicationPage = () => {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState<GymApplicationData>(INITIAL_STATE);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -95,7 +97,8 @@ const GymApplicationPage = () => {
       setIsSubmitting(true);
       await submitGymApplication(formData);
       setIsSubmitted(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // window.scrollTo({ top: 0, behavior: 'smooth' });
+      navigate('/gym/pending-approval')
     } catch (error: any) {
       const message = error.response?.data?.message || "Failed to submit application. Please check your connection.";
       toast.error(message, {

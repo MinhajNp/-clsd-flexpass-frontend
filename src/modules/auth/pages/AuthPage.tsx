@@ -5,7 +5,7 @@ import { clsx } from "clsx";
 import FormInput from "../components/FormInput";
 import Button from "../../../components/ui/Button";
 import { useAuth } from "../hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import GoogleLoginButton from "../components/GoogleLoginButton";
 import { useRedirect } from "../hooks/useRedirect";
 import { useSearchParams } from "react-router-dom";
@@ -188,6 +188,7 @@ const AuthPage = () => {
         className="hidden lg:flex lg:w-5/12 xl:w-[42%] flex-col justify-between p-10 xl:p-14"
         style={{ background: "linear-gradient(160deg, #2D5A53 0%, #1a3530 45%, #000000 100%)" }}
       >
+        <Link to='/'>
         <div className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm">
             <svg viewBox="0 0 24 24" className="h-5 w-5 fill-white" aria-hidden="true">
@@ -196,6 +197,7 @@ const AuthPage = () => {
           </div>
           <span className="text-lg font-bold tracking-tight text-white">FlexPass</span>
         </div>
+         </Link>
 
         <div className="space-y-6">
           <h1 className="text-4xl xl:text-5xl font-extrabold leading-tight text-white">
