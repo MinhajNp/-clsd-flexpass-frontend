@@ -91,7 +91,7 @@ const ForgotPasswordPage = () => {
             disabled={!email || loading}
             className="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 px-6 font-semibold text-sm transition-all duration-300 ease-in-out bg-flex-primary text-white hover:bg-[#26504A] shadow-md shadow-flex-primary/20 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            {loading ? "Sending..." : "Send Reset Link"}
+            {loading ? "Sending..." : "Send OTP"}
           </button>
         </form>
 

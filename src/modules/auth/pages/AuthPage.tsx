@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { CheckCircle, Smartphone, User } from "lucide-react";
 import { clsx } from "clsx";
 import FormInput from "../components/FormInput";
 import Button from "../../../components/ui/Button";
-import SocialButton from "../components/SocialButton";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import GoogleLoginButton from "../components/GoogleLoginButton";
+import { useRedirect } from "../hooks/useRedirect";
+import { useSearchParams } from "react-router-dom";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 type Mode = "login" | "signup";
@@ -64,8 +66,11 @@ const validate = (form: FormState, mode: Mode): FormErrors => {
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 const AuthPage = () => {
-  const { handleLogin, handleRegister, loading } = useAuth();
+  const { handleLogin, handleRegister, handleGoogleLogin, loading } = useAuth();
+  const { performRedirect } = useRedirect();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const urlError = searchParams.get('error');
 
   const [mode, setMode] = useState<Mode>("login");
   const [form, setForm] = useState<FormState>({
@@ -76,6 +81,15 @@ const AuthPage = () => {
     rememberMe: false,
   });
   const [errors, setErrors] = useState<FormErrors>({});
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  useEffect(() => {
+    if (urlError === 'blocked') {
+      toast.error("Your account has been blocked by an administrator.", { duration: 5000 });
+      // Remove the param to avoid repeat toasts
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [urlError]);
 
   const update = (key: keyof FormState, value: string | boolean) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -112,26 +126,52 @@ const AuthPage = () => {
           navigate("/otp", { state: { email: form.email } });
           return;
         }
-        if (res.accessToken) {
+        if (res.accessToken && res.user) {
           localStorage.setItem("accessToken", res.accessToken);
-          navigate("/");
+          localStorage.setItem("userRole", res.user.role);
+          
+          setIsRedirecting(true);
+          setTimeout(() => {
+            performRedirect(res.accessToken, res.user);
+          }, 1000);
         }
       } else {
         await handleRegister({ name: form.name, email: form.email, password: form.password });
         navigate("/otp", { state: { email: form.email } });
       }
-    } catch (err: unknown) {
+    } catch (err: any) {
       if (mode === "login") {
-        toast.error("Login Failed");
+        // useAuth hook wraps axios error into a standard Error object with the backend message
+        const errorMsg = err.message || "Login Failed";
+        toast.error(errorMsg);
         setErrors({ 
-          general: "Wrong credentials. Please try again.",
+          general: errorMsg,
           email: " ",
           password: " "
         });
       } else {
-        const message = err instanceof Error ? err.message : "Something went wrong";
+        const message = err.response?.data?.message || err.message || "Something went wrong";
         setErrors({ general: message });
       }
+    }
+  };
+
+  const handleGoogleSuccess = async (idToken: string) => {
+    try {
+      const res = await handleGoogleLogin(idToken);
+      if (res.accessToken && res.user) {
+        localStorage.setItem("accessToken", res.accessToken);
+        localStorage.setItem("userRole", res.user.role);
+        
+        setIsRedirecting(true);
+        setTimeout(() => {
+          performRedirect(res.accessToken, res.user);
+        }, 1000);
+      }
+    } catch (err: any) {
+      const errorMsg = err.message || "Google Authentication Failed";
+      toast.error(errorMsg);
+      setErrors({ general: errorMsg });
     }
   };
 
@@ -141,7 +181,8 @@ const AuthPage = () => {
   const btnLabel   = isLogin ? "Log In"                                         : "Create Account";
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex relative">
+
       {/* ── LEFT HERO ─────────────────────────────────────────────────────────── */}
       <aside
         className="hidden lg:flex lg:w-5/12 xl:w-[42%] flex-col justify-between p-10 xl:p-14"
@@ -210,6 +251,24 @@ const AuthPage = () => {
             </div>
 
 
+
+            {errors.general && errors.general.toLowerCase().includes("blocked") && (
+              <div className="mb-4 rounded-xl bg-red-50 border border-red-100 p-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="flex gap-3">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-red-800">User blocked by admin</h3>
+                    <p className="mt-1 text-sm text-red-700 leading-relaxed">
+                      Your account has been blocked by an administrator. Please contact our support team for more information.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <form id="auth-form" onSubmit={handleSubmit} noValidate className="space-y-5">
               {!isLogin && (
@@ -282,18 +341,14 @@ const AuthPage = () => {
                 )}
               </div>
 
-              {errors.general && (
-                <div className="mt-2 text-center">
-                  <p className="text-sm font-medium text-red-500">{errors.general}</p>
-                </div>
-              )}
 
               <Button
                 id="auth-submit-btn"
                 type="submit"
                 label={btnLabel}
-                loading={loading}
+                loading={loading || isRedirecting}
                 showArrow
+                fullWidth
               />
             </form>
 
@@ -303,10 +358,9 @@ const AuthPage = () => {
               <div className="h-px flex-1 bg-gray-200" />
             </div>
 
-            <SocialButton
-              id="auth-google-btn"
-              provider="google"
-              onClick={() => console.log("Google OAuth — wire to your provider")}
+            <GoogleLoginButton
+              onSuccess={handleGoogleSuccess}
+              loading={loading || isRedirecting}
             />
 
             <p className="mt-6 text-center text-xs text-gray-400 leading-relaxed">

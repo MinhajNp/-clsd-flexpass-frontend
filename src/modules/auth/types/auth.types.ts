@@ -29,5 +29,7 @@ export type User = {
   id: string;
   name: string;
   email: string;
-  status: "ACTIVE" | "BLOCKED";
+  status: "Active" | "Suspended";
+  role: string;
+  active_membership?: any;
 };

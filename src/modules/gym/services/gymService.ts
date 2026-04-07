@@ -45,3 +45,15 @@ export const submitGymApplication = async (data: GymApplicationData) => {
 
   return response.data;
 };
+
+// ─── Registration Flow ────────────────────────────────────────────────────────
+
+export const verifyRegistrationToken = async (token: string): Promise<any> => {
+  const res = await axios.get(`${API_URL}/registration/verify?token=${token}`);
+  return res.data.data;
+};
+
+export const completeRegistration = async (data: any): Promise<any> => {
+  const res = await axios.post(`${API_URL}/registration/complete`, data);
+  return res.data;
+};

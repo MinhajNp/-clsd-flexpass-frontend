@@ -9,6 +9,12 @@ const PublicRoute = ({ children }: Props) => {
   const token = localStorage.getItem("accessToken");
 
   if (token) {
+    const userRole = localStorage.getItem("userRole");
+    
+    // Redirect logged-in users to their respective dashboards to avoid loops
+    if (userRole === "PLATFORM_ADMIN") return <Navigate to="/admin" replace />;
+    if (userRole === "GYM_ADMIN")      return <Navigate to="/gym-admin" replace />;
+    
     return <Navigate to="/dashboard" replace />;
   }
 

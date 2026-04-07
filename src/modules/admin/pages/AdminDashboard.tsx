@@ -1,8 +1,10 @@
-import { Users, Building2, CalendarCheck, TrendingUp, Wallet, Clock, XCircle, AlertTriangle, Loader2 } from 'lucide-react';
+import { Clock, XCircle, AlertTriangle } from 'lucide-react';
+import Loader from '../../../components/ui/Loader';
 import AdminLayout from '../components/AdminLayout';
 import GymStatusTable from '../components/GymStatusTable';
 import type { AdminDashboardData } from '../types/admin.types';
 import { useDashboardData } from '../hooks/useDashboardData';
+import { usePartnerGymData } from '../hooks/usePartnerGymData';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -35,11 +37,11 @@ const DASHBOARD_DATA: AdminDashboardData = {
     { id: 'a3', severity: 'caution', count: 5, title: 'High no-show rate gyms',  subtitle: 'Exceeds 15% threshold'            },
   ],
   gymOverview: [
-    { id: 'g1', name: 'FitZone Mumbai',    city: 'Mumbai',    category: 'Premium',  status: 'Active'    },
-    { id: 'g2', name: 'PowerHouse Delhi',  city: 'New Delhi', category: 'Standard', status: 'Active'    },
-    { id: 'g3', name: 'FlexFit Bangalore', city: 'Bangalore', category: 'Standard', status: 'Pending'   },
-    { id: 'g4', name: 'IronCore Pune',     city: 'Pune',      category: 'Basic',    status: 'Active'    },
-    { id: 'g5', name: 'ActiveLife Chennai',city: 'Chennai',   category: 'Premium',  status: 'Suspended' },
+    { id: 'g1', name: 'FitZone Mumbai',    city: 'Mumbai',    category: 'Premium',  status: 'Active', isEmergencyMode: false, joinedAt: '2023-10-01' },
+    { id: 'g2', name: 'PowerHouse Delhi',  city: 'New Delhi', category: 'Standard', status: 'Active', isEmergencyMode: true, joinedAt: '2023-09-15' },
+    { id: 'g3', name: 'FlexFit Bangalore', city: 'Bangalore', category: 'Standard', status: 'Pending', isEmergencyMode: false, joinedAt: '2024-01-20' },
+    { id: 'g4', name: 'IronCore Pune',     city: 'Pune',      category: 'Basic',    status: 'Active', isEmergencyMode: false, joinedAt: '2023-11-05' },
+    { id: 'g5', name: 'ActiveLife Chennai',city: 'Chennai',   category: 'Premium',  status: 'Suspended', isEmergencyMode: false, joinedAt: '2023-08-10' },
   ],
 };
 
@@ -101,16 +103,18 @@ const ALERT_CONFIG = {
 // ─── Admin Dashboard ──────────────────────────────────────────────────────────
 
 const AdminDashboard = () => {
-  const { stats: liveStats, isLoading } = useDashboardData();
-  const { revenueSnapshot: rev, alerts, gymOverview } = DASHBOARD_DATA;
+  const { stats: liveStats, isLoading: isDashboardLoading } = useDashboardData();
+  const { partnerGyms, isLoading: isGymsLoading } = usePartnerGymData();
+  const { revenueSnapshot: rev, alerts } = DASHBOARD_DATA;
 
   const displayStats = liveStats || DASHBOARD_DATA.stats;
+  const isLoading = isDashboardLoading || isGymsLoading;
 
   if (isLoading) {
     return (
       <AdminLayout title="Dashboard">
         <div className="flex items-center justify-center min-h-[60vh]">
-          <Loader2 className="h-8 w-8 animate-spin text-[#2D5A53]" />
+          <Loader size="lg" variant="primary" />
         </div>
       </AdminLayout>
     );
@@ -251,7 +255,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* ── Row 3: Gym Status Table ────────────────────────────────── */}
-        <GymStatusTable rows={gymOverview} />
+        <GymStatusTable rows={partnerGyms} />
 
       </div>
     </AdminLayout>

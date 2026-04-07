@@ -14,8 +14,12 @@ import {
   Settings,
   Bell,
   LogOut,
+  FileCheck
 } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { useState } from 'react';
+import ConfirmationModal from '../../../components/ui/ConfirmationModal';
+
 
 // ─── Nav Item Config ──────────────────────────────────────────────────────────
 
@@ -28,6 +32,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard',            to: '/admin',                  icon: <LayoutDashboard size={17} /> },
   { label: 'Gyms',                 to: '/admin/gyms',             icon: <Building2 size={17} /> },
+  { label: 'Partnership Applications', to: '/admin/applications', icon: <FileCheck size={17} /> },
   { label: 'Users',                to: '/admin/users',            icon: <Users size={17} /> },
   { label: 'Membership Plans',     to: '/admin/membership-plans', icon: <CreditCard size={17} /> },
   { label: 'Bookings',             to: '/admin/bookings',         icon: <CalendarCheck size={17} /> },
@@ -104,15 +109,11 @@ const Sidebar = () => (
 
 interface TopHeaderProps {
   title: string;
+  onLogoutClick: () => void;
 }
 
-const TopHeader = ({ title }: TopHeaderProps) => {
-  const navigate = useNavigate();
+const TopHeader = ({ title, onLogoutClick }: TopHeaderProps) => {
 
-  const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    navigate('/auth');
-  };
 
   return (
     <header className="flex h-[60px] flex-shrink-0 items-center justify-between border-b border-gray-100 bg-white px-6">
@@ -151,7 +152,7 @@ const TopHeader = ({ title }: TopHeaderProps) => {
         {/* Logout */}
         <button
           id="admin-logout-btn"
-          onClick={handleLogout}
+          onClick={onLogoutClick}
           className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
           aria-label="Logout"
         >
@@ -170,15 +171,33 @@ interface AdminLayoutProps {
 }
 
 const AdminLayout = ({ children, title = 'Dashboard' }: AdminLayoutProps) => {
+  const navigate = useNavigate();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken');
+    navigate('/auth');
+  };
+
   return (
     <div className="flex h-screen overflow-hidden bg-[#F5F7FA]">
       <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden min-w-0">
-        <TopHeader title={title} />
+        <TopHeader title={title} onLogoutClick={() => setIsLogoutModalOpen(true)} />
         <main className="flex-1 overflow-y-auto p-6">
           {children}
         </main>
       </div>
+
+      <ConfirmationModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={handleLogout}
+        title="Confirm Logout"
+        message="Are you sure you want to log out of the FlexPass Admin panel?"
+        confirmText="Logout"
+        type="danger"
+      />
     </div>
   );
 };

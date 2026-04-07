@@ -17,7 +17,7 @@ export const useAdmin = () => {
   };
 
   const toggleStatus = async (userId: string, currentStatus: string) => {
-    if (currentStatus === "ACTIVE") {
+    if (currentStatus === "Active") {
       console.log(userId);
       await adminService.blockUser(userId);
     } else {
@@ -29,7 +29,7 @@ export const useAdmin = () => {
     setUsers((prev) =>
       prev.map((user) =>
         user.id === userId
-          ? { ...user, status: user.status === "ACTIVE" ? "BLOCKED" : "ACTIVE" }
+          ? { ...user, status: user.status === "Active" ? "Suspended" : "Active" }
           : user
       )
     );

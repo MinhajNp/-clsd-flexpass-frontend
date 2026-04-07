@@ -43,6 +43,8 @@ export interface GymOverviewRow {
   city: string;
   category: GymCategory;
   status: GymStatus;
+  isEmergencyMode: boolean;
+  joinedAt: string;
 }
 
 // ─── Full Dashboard Data Shape ────────────────────────────────────────────────

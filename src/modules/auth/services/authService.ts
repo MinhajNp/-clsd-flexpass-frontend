@@ -21,6 +21,11 @@ export const login = async (data: LoginDto) => {
   return res.data.data; // accessToken is nested: data.data.accessToken
 };
 
+export const googleLogin = async (idToken: string) => {
+  const res = await api.post("/auth/google", { idToken });
+  return res.data.data;
+};
+
 export const logout = async () => {
   await api.post("/auth/logout");
 };

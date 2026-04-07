@@ -3,6 +3,10 @@ import AdminLayout from '../components/AdminLayout';
 import UserTable from '../components/UserTable';
 import { useAdminUsers } from '../hooks/useAdminUsers';
 import type { MembershipPlan, AdminUserStatus } from '../types/admin.types';
+import PaginationFooter from '../../../components/ui/PaginationFooter';
+import ConfirmationModal from '../../../components/ui/ConfirmationModal';
+import { useState } from 'react';
+
 
 // ─── Filter option sets ────────────────────────────────────────────────────────
 
@@ -15,9 +19,9 @@ const PLAN_OPTIONS: Array<{ label: string; value: MembershipPlan | 'All' }> = [
 ];
 
 const STATUS_OPTIONS: Array<{ label: string; value: AdminUserStatus | 'All' }> = [
-  { label: 'All Status',  value: 'All'       },
-  { label: 'Active',      value: 'Active'    },
-  { label: 'Suspended',   value: 'Suspended' },
+  { label: 'All Status',  value: 'All'     },
+  { label: 'Active',      value: 'Active'  },
+  { label: 'Blocked',     value: 'Blocked' },
 ];
 
 // ─── Stat pill ─────────────────────────────────────────────────────────────────
@@ -37,6 +41,9 @@ const UserManagementPage = () => {
   const {
     users,
     totalCount,
+    currentPage,
+    onPageChange,
+    limit,
     loading,
     filters,
     setFilters,
@@ -44,8 +51,48 @@ const UserManagementPage = () => {
     refetch,
   } = useAdminUsers();
 
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    userId: string | null;
+    actionType: 'block' | 'activate';
+  }>({
+    isOpen: false,
+    userId: null,
+    actionType: 'block',
+  });
+
+  const handleToggleStatus = (userId: string) => {
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+
+    if (user.status === 'Active') {
+      setConfirmModal({
+        isOpen: true,
+        userId,
+        actionType: 'block',
+      });
+    } else {
+      // Unblocking might not need confirmation, but we'll add it if requested.
+      // Usually only "dangerous" actions need confirmation.
+      // But let's follow the requirement: "Blocking/Unblocking a user"
+      setConfirmModal({
+        isOpen: true,
+        userId,
+        actionType: 'activate',
+      });
+    }
+  };
+
+  const handleConfirmAction = async () => {
+    if (confirmModal.userId) {
+      await toggleUserStatus(confirmModal.userId);
+    }
+    setConfirmModal(prev => ({ ...prev, isOpen: false }));
+  };
+
+
   const activeCount    = users.filter((u) => u.status === 'Active').length;
-  const suspendedCount = users.filter((u) => u.status === 'Suspended').length;
+  const blockedCount = users.filter((u) => u.status === 'Blocked').length;
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setFilters((f) => ({ ...f, search: e.target.value }));
@@ -79,7 +126,7 @@ const UserManagementPage = () => {
           <div className="flex flex-wrap items-center gap-2">
             <StatPill label="Total"     value={totalCount}    color="bg-gray-400"     />
             <StatPill label="Active"    value={activeCount}   color="bg-emerald-400"  />
-            <StatPill label="Suspended" value={suspendedCount} color="bg-red-400"     />
+            <StatPill label="Blocked"   value={blockedCount}  color="bg-red-400"     />
           </div>
         </div>
 
@@ -178,9 +225,32 @@ const UserManagementPage = () => {
           <UserTable
             users={users}
             loading={loading}
-            onToggleStatus={toggleUserStatus}
+            onToggleStatus={handleToggleStatus}
+          />
+
+          <PaginationFooter
+            currentPage={currentPage}
+            totalCount={totalCount}
+            limit={limit}
+            onPageChange={onPageChange}
+            loading={loading}
           />
         </div>
+
+        <ConfirmationModal
+          isOpen={confirmModal.isOpen}
+          onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+          onConfirm={handleConfirmAction}
+          title={confirmModal.actionType === 'block' ? 'Block User' : 'Unblock User'}
+          message={`Are you sure you want to ${
+            confirmModal.actionType === 'block' ? 'block' : 'unblock'
+          } this user? This will ${
+            confirmModal.actionType === 'block' ? 'prevent them from using FlexPass services' : 'allow them to use services again'
+          }.`}
+          type={confirmModal.actionType === 'block' ? 'danger' : 'info'}
+          confirmText={confirmModal.actionType === 'block' ? 'Block User' : 'Unblock User'}
+        />
+
 
       </div>
     </AdminLayout>

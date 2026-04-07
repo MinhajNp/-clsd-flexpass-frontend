@@ -96,8 +96,12 @@ const GymApplicationPage = () => {
       await submitGymApplication(formData);
       setIsSubmitted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (error) {
-      toast.error("Failed to submit application. Please check your connection.");
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Failed to submit application. Please check your connection.";
+      toast.error(message, {
+        duration: 5000,
+        icon: '⚠️'
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -114,7 +118,7 @@ const GymApplicationPage = () => {
           <p className="text-gray-500 font-medium leading-relaxed mb-10">
             Thank you for applying to partner with FlexPass. Our team will review your details and get back to you within 2-3 business days.
           </p>
-          <Button label="Back to Home" onClick={() => window.location.href = "/"} />
+          <Button label="Back to Home" onClick={() => { window.location.href = "/"; }} />
         </div>
       </div>
     );

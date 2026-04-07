@@ -43,6 +43,19 @@ export const useAuth = () => {
     }
   };
 
+  const handleGoogleLogin = async (idToken: string) => {
+    try {
+      setLoading(true);
+      return await authService.googleLogin(idToken);
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      const message = err.response?.data?.message || "Google login failed";
+      throw new Error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await authService.logout();
@@ -99,6 +112,7 @@ export const useAuth = () => {
     handleRegister,
     handleVerifyOtp,
     handleLogin,
+    handleGoogleLogin,
     handleLogout,
     handleForgotPassword,
     handleResetPassword,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import * as adminService from '../services/adminService';
 import type { AdminUser, AdminUserStatus, MembershipPlan } from '../types/admin.types';
@@ -11,36 +11,62 @@ export interface UserFilters {
   status: AdminUserStatus | 'All';
 }
 
+const normalizeStatus = (status: string): AdminUserStatus => {
+  const s = (status || '').toLowerCase();
+  if (s === 'active') return 'Active';
+  return 'Suspended';
+};
+
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
 export const useAdminUsers = () => {
-  const [users, setUsers]     = useState<AdminUser[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<UserFilters>({
+  const [users, setUsers]           = useState<AdminUser[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading]       = useState(true);
+  const [filters, setFilters]       = useState<UserFilters>({
     search: '',
     plan: 'All',
     status: 'All',
   });
+  const limit = 10;
+
 
   // ── Fetch ─────────────────────────────────────────────────────────────────
 
-  const fetchUsers = useCallback(async () => {
+  const fetchUsers = useCallback(async (page: number = 1) => {
     setLoading(true);
     try {
-      const data = await adminService.fetchAllUsers();
-      setUsers(data);
+      const { data, totalCount: total } = await adminService.fetchAllUsers(page, limit);
+      const normalizedData = data.map(u => ({
+        ...u,
+        status: normalizeStatus(u.status)
+      }));
+      setUsers(normalizedData);
+      setTotalCount(total);
+      setCurrentPage(page);
     } catch (error) {
       console.error("Failed to fetch users:", error);
       toast.error('Failed to load users from the server.');
       setUsers([]);
+      setTotalCount(0);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchUsers();
+    fetchUsers(1); // Fetch first page on mount
   }, [fetchUsers]);
+  
+  // Refetch when filters change (reset to page 1)
+  useEffect(() => {
+    fetchUsers(1);
+  }, [filters, fetchUsers]);
+
+  const handlePageChange = (page: number) => {
+    fetchUsers(page);
+  };
 
   // ── Toggle status (optimistic) ────────────────────────────────────────────
 
@@ -50,7 +76,7 @@ export const useAdminUsers = () => {
 
     const nextStatus: AdminUserStatus =
       user.status === 'Active' ? 'Suspended' : 'Active';
-    const actionTerm = nextStatus === 'Suspended' ? 'blocked' : 'unblocked';
+    const actionTerm = nextStatus === 'Suspended' ? 'suspended' : 'activated';
 
     // Optimistic UI update
     setUsers((prev) =>
@@ -81,30 +107,16 @@ export const useAdminUsers = () => {
     }
   }, [users]);
 
-  // ── Derived: filtered list ────────────────────────────────────────────────
-
-  const filtered = useMemo(() => {
-    const q = filters.search.toLowerCase();
-    return users.filter((u) => {
-      const matchesSearch =
-        !q ||
-        u.name.toLowerCase().includes(q) ||
-        u.email.toLowerCase().includes(q);
-      const matchesPlan =
-        filters.plan === 'All' || u.membershipPlan === filters.plan;
-      const matchesStatus =
-        filters.status === 'All' || u.status === filters.status;
-      return matchesSearch && matchesPlan && matchesStatus;
-    });
-  }, [users, filters]);
-
   return {
-    users: filtered,
-    totalCount: users.length,
+    users: users, 
+    totalCount,
+    currentPage,
+    onPageChange: handlePageChange,
+    limit,
     loading,
     filters,
     setFilters,
     toggleUserStatus,
-    refetch: fetchUsers,
+    refetch: () => fetchUsers(currentPage),
   };
 };

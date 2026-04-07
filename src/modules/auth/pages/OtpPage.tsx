@@ -4,6 +4,7 @@ import { useAuth } from "../hooks/useAuth";
 import OtpInput from "../components/OtpInput";
 import { ArrowLeft } from "lucide-react";
 import { clsx } from "clsx";
+import toast from "react-hot-toast";
 
 type LocationState = {
   email: string;
@@ -95,7 +96,8 @@ const OtpPage = () => {
     try {
       setError("");
       await handleVerifyOtp({ email, otp });
-      navigate("/"); // Successful OTP verification logically goes to landing page now
+      toast.success("Registration completed successfully!");
+      navigate("/auth"); // Redirect to login after email verification
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "OTP verification failed";
       setError(message);

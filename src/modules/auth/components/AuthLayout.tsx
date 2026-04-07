@@ -167,9 +167,9 @@ const Footer = () => {
 export const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
-  // Admin pages handle their own layout (sidebar + admin header) — exclude public chrome
-  const isAdminPage = location.pathname.startsWith('/admin');
-  const isExactAuthPages = ["/auth", "/otp", "/forgot-password", "/reset-password"].includes(location.pathname);
+  // Admin and Gym Admin pages handle their own layout — exclude public chrome
+  const isAdminPage = location.pathname.startsWith('/admin') || location.pathname.startsWith('/gym-admin');
+  const isExactAuthPages = ["/auth", "/otp", "/forgot-password", "/reset-password", "/complete-registration"].includes(location.pathname);
 
   if (isAdminPage) {
     return <>{children}</>;
