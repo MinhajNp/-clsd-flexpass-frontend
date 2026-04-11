@@ -71,7 +71,7 @@ const FormInput = ({
 
       {error && (
         <p className="text-xs text-red-500 flex items-center gap-1">
-          <span className="inline-block w-1 h-1 rounded-full bg-red-500 mt-0.5" />
+          {error.trim() && <span className="inline-block w-1 h-1 rounded-full bg-red-500 mt-0.5" />}
           {error}
         </p>
       )}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { CheckCircle, Smartphone, User } from "lucide-react";
+import { CheckCircle, Smartphone, User, AlertCircle } from "lucide-react";
 import { clsx } from "clsx";
 import FormInput from "../components/FormInput";
 import Button from "../../../components/ui/Button";
@@ -51,7 +51,7 @@ const validate = (form: FormState, mode: Mode): FormErrors => {
   }
   if (!form.password) {
     errors.password = "Password is required";
-  } else if (form.password.length < 6) {
+  } else if (mode === "signup" && form.password.length < 6) {
     errors.password = "Password must be at least 6 characters";
   }
   if (mode === "signup") {
@@ -272,6 +272,17 @@ const AuthPage = () => {
               </div>
             )}
 
+            {errors.general && !errors.general.toLowerCase().includes("blocked") && (
+              <div className="mb-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="flex items-center gap-3 rounded-xl bg-red-50 border border-red-100 p-3.5">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100">
+                    <AlertCircle className="h-4.5 w-4.5 text-red-600" />
+                  </div>
+                  <p className="text-sm font-semibold text-red-800">{errors.general}</p>
+                </div>
+              </div>
+            )}
+
             <form id="auth-form" onSubmit={handleSubmit} noValidate className="space-y-5">
               {!isLogin && (
                 <FormInput
@@ -321,7 +332,7 @@ const AuthPage = () => {
               )}
 
               <div className="flex items-center justify-between">
-                <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-600 select-none">
+               {/* <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-600 select-none">
                   <input
                     id="auth-remember-me"
                     type="checkbox"
@@ -330,7 +341,7 @@ const AuthPage = () => {
                     className="h-4 w-4 rounded border-gray-300 accent-flex-primary"
                   />
                   Remember me
-                </label>
+                </label>*/}
                 {isLogin && (
                   <button
                     type="button"

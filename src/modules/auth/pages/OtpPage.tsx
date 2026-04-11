@@ -53,9 +53,11 @@ const OtpPage = () => {
     if (stored) {
       const expiration = parseInt(stored, 10);
       const remaining = Math.ceil((expiration - Date.now()) / 1000);
-      if (remaining > 0) return remaining;
+      return remaining > 0 ? remaining : 0;
     }
-    localStorage.setItem(`otp_timer_${email}`, (Date.now() + 30000).toString());
+    // Only start a new 30s timer if no record exists (first arrival)
+    const newExpiration = Date.now() + 30000;
+    localStorage.setItem(`otp_timer_${email}`, newExpiration.toString());
     return 30;
   });
 
